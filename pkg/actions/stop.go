@@ -11,23 +11,16 @@
 
 package actions
 
+import (
+	"fmt"
+
+	"github.com/eclipse/codewind-installer/pkg/utils"
+)
+
 //StopCommand to stop only the codewind containers
-func StopCommand() {
-	// containerArr := [2]string{}
-	// containerArr[0] = "codewind-pfe"
-	// containerArr[1] = "codewind-performance"
+func StopCommand(dockerComposeFile string) {
 
-	// containers := utils.GetContainerList()
+	fmt.Println("Only stopping Codewind containers. To stop project containers, please use 'stop-all'")
 
-	// fmt.Println("Only stopping Codewind containers. To stop project containers, please use 'stop-all'")
-
-	// for _, container := range containers {
-	// 	for _, key := range containerArr {
-	// 		if strings.HasPrefix(container.Image, key) {
-	// 			fmt.Println("Stopping container ", container.Names, "... ")
-	// 			utils.StopContainer(container)
-	// 		}
-	// 	}
-	// }
-	//utils.DockerComposeStop(tempFilePath)
+	utils.DockerComposeStop(dockerComposeFile)
 }

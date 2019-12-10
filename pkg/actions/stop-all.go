@@ -19,7 +19,7 @@ import (
 )
 
 //StopAllCommand to stop codewind and project containers
-func StopAllCommand(tempFilePath string) {
+func StopAllCommand(dockerComposeFile string) {
 	containerArr := []string{
 		//"codewind-pfe",
 		//"codewind-performance",
@@ -42,15 +42,5 @@ func StopAllCommand(tempFilePath string) {
 		}
 	}
 
-	// networkName := "codewind"
-	// networks := utils.GetNetworkList()
-	// fmt.Println("Removing Codewind docker networks..")
-	// for _, network := range networks {
-	// 	if strings.Contains(network.Name, networkName) {
-	// 		fmt.Print("Removing docker network: ", network.Name, "... ")
-	// 		utils.RemoveNetwork(network)
-	// 	}
-	// }
-
-	utils.DockerComposeStop(tempFilePath)
+	utils.DockerComposeStop(dockerComposeFile)
 }

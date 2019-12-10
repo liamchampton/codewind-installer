@@ -106,7 +106,7 @@ const (
 )
 
 // DockerCompose to set up the Codewind environment
-func DockerCompose(tempFilePath string, tag string) {
+func DockerCompose(dockerComposeFile string, tag string) {
 
 	// Set env variables for the docker compose file
 	home := os.Getenv("HOME")
@@ -144,12 +144,12 @@ func DockerCompose(tempFilePath string, tag string) {
 	}
 	os.Setenv("PFE_EXTERNAL_PORT", port)
 
-	cmd := exec.Command("docker-compose", "-f", tempFilePath, "up", "-d", "--force-recreate")
+	cmd := exec.Command("docker-compose", "-f", dockerComposeFile, "up", "-d", "--force-recreate")
 	output := new(bytes.Buffer)
 	cmd.Stdout = output
 	cmd.Stderr = output
 	if err := cmd.Start(); err != nil { // after 'Start' the program is continued and script is executing in background
-		DeleteTempFile(tempFilePath)
+		DeleteTempFile(dockerComposeFile)
 		errors.CheckErr(err, 101, "Is docker-compose installed?")
 	}
 	fmt.Printf("Please wait whilst containers initialize... %s \n", output.String())
@@ -157,19 +157,19 @@ func DockerCompose(tempFilePath string, tag string) {
 	fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
 
 	if strings.Contains(output.String(), "ERROR") || strings.Contains(output.String(), "error") {
-		DeleteTempFile(tempFilePath)
+		DeleteTempFile(dockerComposeFile)
 		os.Exit(1)
 	}
 
 	if strings.Contains(output.String(), "The image for the service you're trying to recreate has been removed") {
-		DeleteTempFile(tempFilePath)
+		DeleteTempFile(dockerComposeFile)
 		os.Exit(1)
 	}
 }
 
 //*************************************************************************************************************************************************************************************************
 // DockerCompose to set up the Codewind environment
-func DockerComposeStop(tempFilePath string) {
+func DockerComposeStop(dockerComposeFile string) {
 
 	// Set env variables for the docker compose file
 	home := os.Getenv("HOME")
@@ -207,13 +207,13 @@ func DockerComposeStop(tempFilePath string) {
 	}
 	os.Setenv("PFE_EXTERNAL_PORT", port)
 
-	cmd := exec.Command("docker-compose", "-f", tempFilePath, "rm", "--stop", "-f")
+	cmd := exec.Command("docker-compose", "-f", dockerComposeFile, "rm", "--stop", "-f")
 	//cmd := exec.Command("docker-compose", "down", "--remove-orphans")
 	output := new(bytes.Buffer)
 	cmd.Stdout = output
 	cmd.Stderr = output
 	if err := cmd.Start(); err != nil { // after 'Start' the program is continued and script is executing in background
-		//DeleteTempFile(tempFilePath)
+		//DeleteTempFile(dockerComposeFile)
 		errors.CheckErr(err, 101, "Is docker-compose installed?")
 	}
 	fmt.Printf("Please wait whilst containers shutdown... %s \n", output.String())
@@ -221,18 +221,18 @@ func DockerComposeStop(tempFilePath string) {
 	fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
 
 	if strings.Contains(output.String(), "ERROR") || strings.Contains(output.String(), "error") {
-		//DeleteTempFile(tempFilePath)
+		//DeleteTempFile(dockerComposeFile)
 		os.Exit(1)
 	}
 
 	if strings.Contains(output.String(), "The image for the service you're trying to recreate has been removed") {
-		//DeleteTempFile(tempFilePath)
+		//DeleteTempFile(dockerComposeFile)
 		os.Exit(1)
 	}
 
 }
 
-func DockerComposeRemove(tempFilePath, tag string) {
+func DockerComposeRemove(dockerComposeFile, tag string) {
 	// Set env variables for the docker compose file
 	home := os.Getenv("HOME")
 
@@ -268,12 +268,12 @@ func DockerComposeRemove(tempFilePath, tag string) {
 		fmt.Printf("No available external ports in range, will default to Docker-assigned port")
 	}
 	os.Setenv("PFE_EXTERNAL_PORT", port)
-	cmd := exec.Command("docker-compose", "-f", tempFilePath, "down", "--rmi", "all")
+	cmd := exec.Command("docker-compose", "-f", dockerComposeFile, "down", "--rmi", "all")
 	output := new(bytes.Buffer)
 	cmd.Stdout = output
 	cmd.Stderr = output
 	if err := cmd.Start(); err != nil { // after 'Start' the program is continued and script is executing in background
-		//DeleteTempFile(tempFilePath)
+		//DeleteTempFile(dockerComposeFile)
 		errors.CheckErr(err, 101, "Is docker-compose installed?")
 	}
 	fmt.Printf("Please wait whilst images are removed... %s \n", output.String())
@@ -281,12 +281,12 @@ func DockerComposeRemove(tempFilePath, tag string) {
 	fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
 
 	if strings.Contains(output.String(), "ERROR") || strings.Contains(output.String(), "error") {
-		//DeleteTempFile(tempFilePath)
+		//DeleteTempFile(dockerComposeFile)
 		os.Exit(1)
 	}
 
 	if strings.Contains(output.String(), "The image for the service you're trying to recreate has been removed") {
-		//DeleteTempFile(tempFilePath)
+		//DeleteTempFile(dockerComposeFile)
 		os.Exit(1)
 	}
 }
