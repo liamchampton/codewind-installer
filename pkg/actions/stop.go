@@ -11,10 +11,6 @@
 
 package actions
 
-import (
-	"github.com/eclipse/codewind-installer/pkg/utils"
-)
-
 //StopCommand to stop only the codewind containers
 func StopCommand() {
 	// containerArr := [2]string{}
@@ -33,5 +29,5 @@ func StopCommand() {
 	// 		}
 	// 	}
 	// }
-	utils.DockerComposeStop()
+	//utils.DockerComposeStop(tempFilePath)
 }

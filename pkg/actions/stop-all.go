@@ -19,7 +19,7 @@ import (
 )
 
 //StopAllCommand to stop codewind and project containers
-func StopAllCommand() {
+func StopAllCommand(tempFilePath string) {
 	containerArr := []string{
 		//"codewind-pfe",
 		//"codewind-performance",
@@ -52,5 +52,5 @@ func StopAllCommand() {
 	// 	}
 	// }
 
-	utils.DockerComposeStop()
+	utils.DockerComposeStop(tempFilePath)
 }

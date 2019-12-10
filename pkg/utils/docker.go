@@ -169,7 +169,7 @@ func DockerCompose(tempFilePath string, tag string) {
 
 //*************************************************************************************************************************************************************************************************
 // DockerCompose to set up the Codewind environment
-func DockerComposeStop() {
+func DockerComposeStop(tempFilePath string) {
 
 	// Set env variables for the docker compose file
 	home := os.Getenv("HOME")
@@ -207,7 +207,7 @@ func DockerComposeStop() {
 	}
 	os.Setenv("PFE_EXTERNAL_PORT", port)
 
-	cmd := exec.Command("docker-compose", "rm", "--stop", "-f")
+	cmd := exec.Command("docker-compose", "-f", tempFilePath, "rm", "--stop", "-f")
 	//cmd := exec.Command("docker-compose", "down", "--remove-orphans")
 	output := new(bytes.Buffer)
 	cmd.Stdout = output
@@ -232,7 +232,7 @@ func DockerComposeStop() {
 
 }
 
-func DockerComposeRemove(tag string) {
+func DockerComposeRemove(tempFilePath, tag string) {
 	// Set env variables for the docker compose file
 	home := os.Getenv("HOME")
 
@@ -268,7 +268,7 @@ func DockerComposeRemove(tag string) {
 		fmt.Printf("No available external ports in range, will default to Docker-assigned port")
 	}
 	os.Setenv("PFE_EXTERNAL_PORT", port)
-	cmd := exec.Command("docker-compose", "down", "--rmi", "all")
+	cmd := exec.Command("docker-compose", "-f", tempFilePath, "down", "--rmi", "all")
 	output := new(bytes.Buffer)
 	cmd.Stdout = output
 	cmd.Stderr = output

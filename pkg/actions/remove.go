@@ -23,7 +23,7 @@ import (
 )
 
 //RemoveCommand to remove all codewind and project images
-func RemoveCommand(c *cli.Context) {
+func RemoveCommand(c *cli.Context, tempFilePath string) {
 	tag := c.String("tag")
 	imageArr := []string{
 		// "eclipse/codewind-pfe-amd64:" + tag,
@@ -59,7 +59,7 @@ func RemoveCommand(c *cli.Context) {
 	// 		utils.RemoveNetwork(network)
 	// 	}
 	// }
-	utils.DockerComposeRemove(tag)
+	utils.DockerComposeRemove(tempFilePath, tag)
 }
 
 // DoRemoteRemove : Delete a remote Codewind deployment

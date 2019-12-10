@@ -22,8 +22,8 @@ import (
 	"github.com/urfave/cli"
 )
 
-//var tempFilePath = "codewind-docker-compose.yaml"
-var tempFilePath = "docker-compose.yaml"
+var user = os.Getenv("USER")
+var tempFilePath = "/Users/" + user + "/.codewind/docker-compose.yaml"
 
 const healthEndpoint = "/api/v1/environment"
 
@@ -266,7 +266,7 @@ func Commands() {
 			Name:  "stop-all",
 			Usage: "Stop all of the Codewind and project containers",
 			Action: func(c *cli.Context) error {
-				StopAllCommand()
+				StopAllCommand(tempFilePath)
 				return nil
 			},
 		},
@@ -282,7 +282,7 @@ func Commands() {
 			},
 			Usage: "Remove Codewind/Project docker images and the codewind network",
 			Action: func(c *cli.Context) error {
-				RemoveCommand(c)
+				RemoveCommand(c, tempFilePath)
 				return nil
 			},
 			Subcommands: []cli.Command{
