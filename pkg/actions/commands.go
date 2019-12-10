@@ -22,7 +22,8 @@ import (
 	"github.com/urfave/cli"
 )
 
-var tempFilePath = "codewind-docker-compose.yaml"
+//var tempFilePath = "codewind-docker-compose.yaml"
+var tempFilePath = "docker-compose.yaml"
 
 const healthEndpoint = "/api/v1/environment"
 

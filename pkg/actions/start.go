@@ -30,12 +30,12 @@ func StartCommand(c *cli.Context, tempFilePath string, healthEndpoint string) {
 		fmt.Println("Debug:", debug)
 
 		// Stop all running project containers and remove codewind networks
-		StopAllCommand()
+		//StopAllCommand()
 
 		utils.CreateTempFile(tempFilePath)
 		utils.WriteToComposeFile(tempFilePath, debug)
 		utils.DockerCompose(tempFilePath, tag)
-		utils.DeleteTempFile(tempFilePath) // Remove installer-docker-compose.yaml
+		//utils.DeleteTempFile(tempFilePath) // Remove installer-docker-compose.yaml
 		utils.PingHealth(healthEndpoint)
 	}
 }
