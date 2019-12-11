@@ -107,42 +107,7 @@ const (
 
 // DockerCompose to set up the Codewind environment
 func DockerCompose(dockerComposeFile string, tag string) {
-
-	// Set env variables for the docker compose file
-	home := os.Getenv("HOME")
-
-	const GOARCH string = runtime.GOARCH
-	const GOOS string = runtime.GOOS
-	fmt.Println("System architecture is: ", GOARCH)
-	fmt.Println("Host operating system is: ", GOOS)
-
-	if GOARCH == "x86_64" || GOARCH == "amd64" {
-		os.Setenv("PLATFORM", "-amd64")
-	} else {
-		os.Setenv("PLATFORM", "-"+GOARCH)
-	}
-
-	//os.Setenv("REPOSITORY", "")
-	os.Setenv("TAG", tag)
-	if GOOS == "windows" {
-		os.Setenv("WORKSPACE_DIRECTORY", "C:\\codewind-data")
-		// In Windows, calling the env variable "HOME" does not return
-		// the user directory correctly
-		os.Setenv("HOST_HOME", os.Getenv("USERPROFILE"))
-
-	} else {
-		os.Setenv("WORKSPACE_DIRECTORY", home+"/codewind-data")
-		os.Setenv("HOST_HOME", home)
-	}
-	os.Setenv("HOST_OS", GOOS)
-	os.Setenv("COMPOSE_PROJECT_NAME", "codewind")
-	os.Setenv("HOST_MAVEN_OPTS", os.Getenv("MAVEN_OPTS"))
-	fmt.Printf("Attempting to find available port\n")
-	portAvailable, port := IsTCPPortAvailable(minTCPPort, maxTCPPort)
-	if !portAvailable {
-		fmt.Printf("No available external ports in range, will default to Docker-assigned port")
-	}
-	os.Setenv("PFE_EXTERNAL_PORT", port)
+	setupDockerComposeEnvs(tag)
 
 	cmd := exec.Command("docker-compose", "-f", dockerComposeFile, "up", "-d", "--force-recreate")
 	output := new(bytes.Buffer)
@@ -169,46 +134,11 @@ func DockerCompose(dockerComposeFile string, tag string) {
 
 //*************************************************************************************************************************************************************************************************
 // DockerCompose to set up the Codewind environment
-func DockerComposeStop(dockerComposeFile string) {
+func DockerComposeStop(tag, dockerComposeFile string) {
 
-	// Set env variables for the docker compose file
-	home := os.Getenv("HOME")
-
-	const GOARCH string = runtime.GOARCH
-	const GOOS string = runtime.GOOS
-	fmt.Println("System architecture is: ", GOARCH)
-	fmt.Println("Host operating system is: ", GOOS)
-
-	if GOARCH == "x86_64" || GOARCH == "amd64" {
-		os.Setenv("PLATFORM", "-amd64")
-	} else {
-		os.Setenv("PLATFORM", "-"+GOARCH)
-	}
-
-	//os.Setenv("REPOSITORY", "")
-	os.Setenv("TAG", "")
-	if GOOS == "windows" {
-		os.Setenv("WORKSPACE_DIRECTORY", "C:\\codewind-data")
-		// In Windows, calling the env variable "HOME" does not return
-		// the user directory correctly
-		os.Setenv("HOST_HOME", os.Getenv("USERPROFILE"))
-
-	} else {
-		os.Setenv("WORKSPACE_DIRECTORY", home+"/codewind-data")
-		os.Setenv("HOST_HOME", home)
-	}
-	os.Setenv("HOST_OS", GOOS)
-	os.Setenv("COMPOSE_PROJECT_NAME", "codewind")
-	os.Setenv("HOST_MAVEN_OPTS", os.Getenv("MAVEN_OPTS"))
-	fmt.Printf("Attempting to find available port\n")
-	portAvailable, port := IsTCPPortAvailable(minTCPPort, maxTCPPort)
-	if !portAvailable {
-		fmt.Printf("No available external ports in range, will default to Docker-assigned port")
-	}
-	os.Setenv("PFE_EXTERNAL_PORT", port)
+	setupDockerComposeEnvs(tag)
 
 	cmd := exec.Command("docker-compose", "-f", dockerComposeFile, "rm", "--stop", "-f")
-	//cmd := exec.Command("docker-compose", "down", "--remove-orphans")
 	output := new(bytes.Buffer)
 	cmd.Stdout = output
 	cmd.Stderr = output
@@ -225,14 +155,30 @@ func DockerComposeStop(dockerComposeFile string) {
 		os.Exit(1)
 	}
 
-	if strings.Contains(output.String(), "The image for the service you're trying to recreate has been removed") {
-		//DeleteTempFile(dockerComposeFile)
-		os.Exit(1)
-	}
-
 }
 
 func DockerComposeRemove(dockerComposeFile, tag string) {
+
+	setupDockerComposeEnvs(tag)
+	cmd := exec.Command("docker-compose", "-f", dockerComposeFile, "down", "--rmi", "all")
+	output := new(bytes.Buffer)
+	cmd.Stdout = output
+	cmd.Stderr = output
+	if err := cmd.Start(); err != nil { // after 'Start' the program is continued and script is executing in background
+		//DeleteTempFile(dockerComposeFile)
+		errors.CheckErr(err, 101, "Is docker-compose installed?")
+	}
+	fmt.Printf("Please wait whilst images are removed... %s \n", output.String())
+	cmd.Wait()
+	fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
+
+	if strings.Contains(output.String(), "ERROR") || strings.Contains(output.String(), "error") {
+		//DeleteTempFile(dockerComposeFile)
+		os.Exit(1)
+	}
+}
+
+func setupDockerComposeEnvs(tag string) {
 	// Set env variables for the docker compose file
 	home := os.Getenv("HOME")
 
@@ -247,7 +193,6 @@ func DockerComposeRemove(dockerComposeFile, tag string) {
 		os.Setenv("PLATFORM", "-"+GOARCH)
 	}
 
-	//os.Setenv("REPOSITORY", "")
 	os.Setenv("TAG", tag)
 	if GOOS == "windows" {
 		os.Setenv("WORKSPACE_DIRECTORY", "C:\\codewind-data")
@@ -268,27 +213,6 @@ func DockerComposeRemove(dockerComposeFile, tag string) {
 		fmt.Printf("No available external ports in range, will default to Docker-assigned port")
 	}
 	os.Setenv("PFE_EXTERNAL_PORT", port)
-	cmd := exec.Command("docker-compose", "-f", dockerComposeFile, "down", "--rmi", "all")
-	output := new(bytes.Buffer)
-	cmd.Stdout = output
-	cmd.Stderr = output
-	if err := cmd.Start(); err != nil { // after 'Start' the program is continued and script is executing in background
-		//DeleteTempFile(dockerComposeFile)
-		errors.CheckErr(err, 101, "Is docker-compose installed?")
-	}
-	fmt.Printf("Please wait whilst images are removed... %s \n", output.String())
-	cmd.Wait()
-	fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
-
-	if strings.Contains(output.String(), "ERROR") || strings.Contains(output.String(), "error") {
-		//DeleteTempFile(dockerComposeFile)
-		os.Exit(1)
-	}
-
-	if strings.Contains(output.String(), "The image for the service you're trying to recreate has been removed") {
-		//DeleteTempFile(dockerComposeFile)
-		os.Exit(1)
-	}
 }
 
 //*************************************************************************************************************************************************************************************************

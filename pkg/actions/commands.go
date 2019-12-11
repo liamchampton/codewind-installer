@@ -270,7 +270,7 @@ func Commands() {
 			Name:  "stop",
 			Usage: "Stop the running Codewind containers",
 			Action: func(c *cli.Context) error {
-				StopCommand(dockerComposeFile)
+				StopCommand(c, dockerComposeFile)
 				return nil
 			},
 		},
@@ -279,7 +279,7 @@ func Commands() {
 			Name:  "stop-all",
 			Usage: "Stop all of the Codewind and project containers",
 			Action: func(c *cli.Context) error {
-				StopAllCommand(dockerComposeFile)
+				StopAllCommand(c, dockerComposeFile)
 				return nil
 			},
 		},

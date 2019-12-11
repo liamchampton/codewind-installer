@@ -15,12 +15,14 @@ import (
 	"fmt"
 
 	"github.com/eclipse/codewind-installer/pkg/utils"
+	"github.com/urfave/cli"
 )
 
 //StopCommand to stop only the codewind containers
-func StopCommand(dockerComposeFile string) {
+func StopCommand(c *cli.Context, dockerComposeFile string) {
+	tag := c.String("tag")
 
 	fmt.Println("Only stopping Codewind containers. To stop project containers, please use 'stop-all'")
 
-	utils.DockerComposeStop(dockerComposeFile)
+	utils.DockerComposeStop(tag, dockerComposeFile)
 }
