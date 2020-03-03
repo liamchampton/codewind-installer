@@ -14,7 +14,7 @@ package actions
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	logr "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 
@@ -39,7 +39,7 @@ func StatusCommandRemoteConnection(c *cli.Context) {
 	conID := c.String("conid")
 	connection, conErr := connections.GetConnectionByID(conID)
 	if conErr != nil {
-		fmt.Println(conErr)
+		logr.Error(conErr)
 		os.Exit(1)
 	}
 
@@ -53,15 +53,15 @@ func StatusCommandRemoteConnection(c *cli.Context) {
 				Status: "stopped",
 			}
 			if err != nil {
-				fmt.Println(err)
+				logr.Error(err)
 				os.Exit(1)
 			}
 			output, _ := json.Marshal(resp)
 			fmt.Println(string(output))
 			os.Exit(1)
 		} else {
-			fmt.Println("Codewind did not respond on remote connection", conID)
-			log.Println(err)
+			logr.Info("Codewind did not respond on remote connection", conID)
+			logr.Error(err)
 		}
 	}
 
@@ -79,7 +79,7 @@ func StatusCommandRemoteConnection(c *cli.Context) {
 		output, _ := json.Marshal(resp)
 		fmt.Println(string(output))
 	} else {
-		fmt.Println("Remote Codewind is installed and running")
+		logr.Info("Remote Codewind is installed and running")
 	}
 	os.Exit(0)
 }
@@ -135,7 +135,7 @@ func StatusCommandLocalConnection(c *cli.Context) {
 			output, _ := json.Marshal(resp)
 			fmt.Println(string(output))
 		} else {
-			fmt.Println("Codewind is installed and running on http://" + hostname + ":" + port)
+			logr.Info("Codewind is installed and running on http://" + hostname + ":" + port)
 		}
 		os.Exit(0)
 	}
@@ -169,7 +169,7 @@ func StatusCommandLocalConnection(c *cli.Context) {
 			output, _ := json.Marshal(resp)
 			fmt.Println(string(output))
 		} else {
-			fmt.Println("Codewind is installed but not running")
+			logr.Info("Codewind is installed but not running")
 		}
 		os.Exit(0)
 	} else {
@@ -178,7 +178,7 @@ func StatusCommandLocalConnection(c *cli.Context) {
 			output, _ := json.Marshal(map[string]string{"status": "uninstalled"})
 			fmt.Println(string(output))
 		} else {
-			fmt.Println("Codewind is not installed")
+			logr.Info("Codewind is not installed")
 		}
 		os.Exit(0)
 	}

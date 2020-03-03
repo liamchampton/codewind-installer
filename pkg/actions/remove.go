@@ -44,7 +44,7 @@ func RemoveCommand(c *cli.Context, dockerComposeFile string) {
 		os.Exit(1)
 	}
 
-	fmt.Println("Removing Codewind docker images..")
+	logr.Info("Removing Codewind docker images..")
 
 	for _, image := range images {
 		imageRepo := strings.Join(image.RepoDigests, " ")
@@ -52,9 +52,9 @@ func RemoveCommand(c *cli.Context, dockerComposeFile string) {
 		for _, key := range imageArr {
 			if strings.HasPrefix(imageRepo, key) || strings.HasPrefix(imageTags, key) {
 				if len(image.RepoTags) > 0 {
-					fmt.Println("Deleting Image ", image.RepoTags[0], "... ")
+					logr.Info("Deleting Image ", image.RepoTags[0], "... ")
 				} else {
-					fmt.Println("Deleting Image ", image.ID, "... ")
+					logr.Info("Deleting Image ", image.ID, "... ")
 				}
 				utils.RemoveImage(image.ID)
 			}

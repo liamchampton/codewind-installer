@@ -12,7 +12,7 @@
 package actions
 
 import (
-	"fmt"
+	logr "github.com/sirupsen/logrus"
 	"strings"
 
 	"github.com/eclipse/codewind-installer/pkg/apiroutes"
@@ -35,7 +35,7 @@ func ListTemplates(c *cli.Context) {
 	if len(templates) > 0 {
 		utils.PrettyPrintJSON(templates)
 	} else {
-		fmt.Println(templates)
+		logr.Info(templates)
 	}
 }
 

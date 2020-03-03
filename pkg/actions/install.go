@@ -72,7 +72,7 @@ func InstallCommand(c *cli.Context) {
 		}
 	}
 
-	fmt.Println("Image Install Successful")
+	logr.Info("Image Install Successful")
 }
 
 // DoRemoteInstall : Deploy a remote PFE and support containers

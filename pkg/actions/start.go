@@ -12,7 +12,7 @@
 package actions
 
 import (
-	"fmt"
+	logr "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/eclipse/codewind-installer/pkg/utils"
@@ -34,12 +34,12 @@ func StartCommand(c *cli.Context, dockerComposeFile string, healthEndpoint strin
 	}
 
 	if status {
-		fmt.Println("Codewind is already running!")
+		logr.Info("Codewind is already running!")
 	} else {
 		tag := c.String("tag")
 		debug := c.Bool("debug")
 		loglevel := c.GlobalString("loglevel")
-		fmt.Println("Debug:", debug)
+		logr.Info("Debug:", debug)
 
 		utils.CreateTempFile(dockerComposeFile)
 		utils.WriteToComposeFile(dockerComposeFile, debug)

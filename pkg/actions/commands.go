@@ -910,6 +910,7 @@ func Commands() {
 			break
 		default:
 			logr.SetLevel(logr.InfoLevel)
+			logr.SetOutput(os.Stdout)
 		}
 
 		return nil

@@ -12,7 +12,7 @@
 package actions
 
 import (
-	"fmt"
+	logr "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/eclipse/codewind-installer/pkg/utils"
@@ -41,10 +41,10 @@ func StopAllCommand(c *cli.Context, dockerComposeFile string) {
 		os.Exit(1)
 	}
 
-	fmt.Println("Stopping Project containers")
+	logr.Info("Stopping Project containers")
 	containersToRemove := utils.GetContainersToRemove(containers)
 	for _, container := range containersToRemove {
-		fmt.Println("Stopping container ", container.Names[0], "... ")
+		logr.Info("Stopping container ", container.Names[0], "... ")
 		utils.StopContainer(dockerClient, container)
 	}
 }

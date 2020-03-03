@@ -196,13 +196,14 @@ func DockerComposeStop(tag, dockerComposeFile string) *DockerError {
 		fmt.Printf(output.String())
 		return &DockerError{errOpDockerComposeStop, err, err.Error()}
 	}
-	fmt.Printf("Please wait while containers shutdown... %s \n", output.String())
+	logr.Infof("Please wait while containers shutdown... %s \n", output.String())
 	if err := cmd.Wait(); err != nil {
 		//print out docker-compose sysout & syserr for error diagnosis
 		fmt.Printf(output.String())
 		return &DockerError{errOpDockerComposeStop, err, err.Error()}
 	}
-	fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
+	//fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
+	logr.Info(output.String())
 
 	if strings.Contains(output.String(), "ERROR") || strings.Contains(output.String(), "error") {
 		os.Exit(1)
@@ -221,17 +222,19 @@ func DockerComposeRemove(dockerComposeFile, tag string) *DockerError {
 	err := cmd.Start()
 	if err != nil {
 		//print out docker-compose sysout & syserr for error diagnosis
-		fmt.Printf(output.String())
+		//fmt.Printf(output.String())
+		logr.Info(output.String())
 		return &DockerError{errOpDockerComposeRemove, err, err.Error()}
 	}
-	fmt.Printf("Please wait whilst images are removed... %s \n", output.String())
+	logr.Infof("Please wait whilst images are removed... %s \n", output.String())
 	err = cmd.Wait()
 	if err != nil {
 		//print out docker-compose sysout & syserr for error diagnosis
 		fmt.Printf(output.String())
 		return &DockerError{errOpImageRemove, err, err.Error()}
 	}
-	fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
+	//fmt.Printf(output.String()) // Wait to finish execution, so we can read all output
+	logr.Info(output.String())
 
 	if strings.Contains(output.String(), "ERROR") || strings.Contains(output.String(), "error") {
 		os.Exit(1)
@@ -247,8 +250,8 @@ func setupDockerComposeEnvs(tag, command string, loglevel string) {
 
 	const GOARCH string = runtime.GOARCH
 	const GOOS string = runtime.GOOS
-	fmt.Println("System architecture is: ", GOARCH)
-	fmt.Println("Host operating system is: ", GOOS)
+	logr.Info("System architecture is: ", GOARCH)
+	logr.Info("Host operating system is: ", GOOS)
 	if GOARCH == "x86_64" || GOARCH == "amd64" {
 		os.Setenv("PLATFORM", "-amd64")
 	} else {
@@ -272,10 +275,10 @@ func setupDockerComposeEnvs(tag, command string, loglevel string) {
 	if command == "remove" || command == "stop" {
 		os.Setenv("PFE_EXTERNAL_PORT", "")
 	} else {
-		fmt.Printf("Attempting to find available port\n")
+		logr.Info("Attempting to find available port\n")
 		portAvailable, port := IsTCPPortAvailable(minTCPPort, maxTCPPort)
 		if !portAvailable {
-			fmt.Printf("No available external ports in range, will default to Docker-assigned port")
+			logr.Infof("No available external ports in range, will default to Docker-assigned port")
 		}
 		os.Setenv("PFE_EXTERNAL_PORT", port)
 	}
@@ -559,7 +562,7 @@ func IsTCPPortAvailable(minTCPPort int, maxTCPPort int) (bool, string) {
 			log.Println("Unable to connect to port", port, ":", err)
 		} else {
 			status = "Port " + strconv.Itoa(port) + " Available"
-			fmt.Println(status)
+			logr.Info(status)
 			conn.Close()
 			return true, strconv.Itoa(port)
 		}

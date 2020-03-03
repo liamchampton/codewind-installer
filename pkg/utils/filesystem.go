@@ -46,7 +46,7 @@ func CreateTempFile(filePath string) bool {
 		defer file.Close()
 
 		dir, _ := os.Getwd()
-		fmt.Println("==> created file", path.Join(dir, filePath))
+		logr.Info("==> created file", path.Join(dir, filePath))
 		return true
 	}
 	return false
@@ -73,9 +73,9 @@ func WriteToComposeFile(dockerComposeFile string, debug bool) bool {
 	errors.CheckErr(err, 203, "")
 
 	if debug == true {
-		fmt.Printf("==> %s structure is: \n%s\n\n", dockerComposeFile, string(marshalledData))
+		logr.Infof("==> %s structure is: \n%s\n\n", dockerComposeFile, string(marshalledData))
 	} else {
-		fmt.Println("==> environment structure written to " + filepath.ToSlash(dockerComposeFile))
+		logr.Infof("==> environment structure written to " + filepath.ToSlash(dockerComposeFile))
 	}
 
 	err = ioutil.WriteFile(dockerComposeFile, marshalledData, 0644)
@@ -100,7 +100,7 @@ func DeleteTempFile(filePath string) (bool, error) {
 // PingHealth - pings environment api every 15 seconds to check if containers started
 func PingHealth(healthEndpoint string) (bool, *DockerError) {
 	var started = false
-	fmt.Println("Waiting for Codewind to start")
+	logr.Info("Waiting for Codewind to start")
 
 	dockerClient, err := NewDockerClient()
 	if err != nil {
@@ -118,7 +118,7 @@ func PingHealth(healthEndpoint string) (bool, *DockerError) {
 		} else {
 			if resp.StatusCode == 200 {
 				fmt.Println("\nHTTP Response Status:", resp.StatusCode, http.StatusText(resp.StatusCode))
-				fmt.Println("Codewind successfully started on http://" + hostname + ":" + port)
+				logr.Info("Codewind successfully started on http://" + hostname + ":" + port)
 				started = true
 				break
 			}

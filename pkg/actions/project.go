@@ -136,7 +136,7 @@ func ProjectGetConnection(c *cli.Context) {
 		HandleProjectError(err)
 		os.Exit(1)
 	}
-	fmt.Println(connectionTargets)
+	logr.Info(connectionTargets)
 	os.Exit(0)
 }
 
@@ -180,7 +180,7 @@ func ProjectList(c *cli.Context) {
 		fmt.Println(string(json))
 	} else {
 		if len(projects) == 0 {
-			fmt.Println("No projects bound to Codewind")
+			logr.Info("No projects bound to Codewind")
 		} else {
 			w := new(tabwriter.Writer)
 			w.Init(os.Stdout, 0, 8, 2, '\t', 0)
